@@ -48,6 +48,41 @@ for test code. The tasks for custom source sets are named according to their `co
 
 The names of the tasks in Android Projects contain [build variant](https://developer.android.com/studio/build/build-variants.html) names and follow the `compile<BuildVariant>Kotlin` pattern, for example, `compileDebugKotlin` or `compileReleaseUnitTestKotlin`.
 
+For both JVM and Android Projects it's possible since 1.9.0 to define options in a following way:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+kotlin {
+    compilerOptions {
+        apiVersion.set(KotlinVersion.KOTLIN_1_9)
+    }
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+kotlin {
+    compilerOptions {
+        apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+    }
+}
+```
+
+</tab>
+</tabs>
+
+Some important things to be aware of:
+
+- `android.kotlinOptions` and `kotlin.compilerOptions` interfere: one below will overwrite the one above
+- `kotlin.compilerOptions` work module-wise, not project-wise
+- `android.kotlinOptions.moduleName` might be overwritten by `kotlin.compilerOptions.moduleName` if the latter one goes below the first one
+- The separate configuration of `tasks.withType(KotlinCompile::class.java)` will overwrite the configuration inside `kotlinOptions`
+
+
 When targeting JavaScript, the tasks are called `compileKotlinJs` for production code and `compileTestKotlinJs` for test code, and `compile<Name>KotlinJs` for custom source sets.
 
 To configure a single task, use its name. Examples:
@@ -116,6 +151,13 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
 
 Here is a complete list of options for Gradle tasks:
 
+### Common attributes
+
+| Name              | Description                                     | Possible values           | Default value |
+|-------------------|-------------------------------------------------|---------------------------|---------------|
+| `optIn`           | Property to configure opt-in compiler arguments | `listOf( /* opt-ins */ )` | `emptyList()` |
+| `progressiveMode` | Enable progressive compiler mode                | `true`, `false`           | `false`       |
+
 ### Attributes specific to JVM
 
 | Name | Description | Possible values |Default value |
@@ -123,6 +165,7 @@ Here is a complete list of options for Gradle tasks:
 | `javaParameters` | Generate metadata for Java 1.8 reflection on method parameters |  | false |
 | `jvmTarget` | Target version of the generated JVM bytecode | "1.8", "9", "10", ..., "19". Also, see [Types for compiler options](#types-for-compiler-options) | "%defaultJvmTargetVersion%" |
 | `noJdk` | Don't automatically include the Java runtime into the classpath |  | false |
+| `jvmTargetValidationMode` | Validation of compatibility of Kotlin and Java targets.<br/>Is a property of tasks of type `KotlinCompile`, see an [example](#example-of-setting-of-jvm-target-validation-mode) | `WARNING`, `ERROR`, `INFO` | `ERROR` |
 
 ### Attributes common to JVM, JS, and JS DCE
 
@@ -155,9 +198,9 @@ val compileKotlin: KotlinCompilationTask<*> by tasks
 // Single experimental argument
 compileKotlin.compilerOptions.freeCompilerArgs.add("-Xexport-kdoc")
 // Single additional argument, can be a key-value pair
-compileKotlin.compilerOptions.freeCompilerArgs.add("-opt-in=org.mylibrary.OptInAnnotation")
+compileKotlin.compilerOptions.freeCompilerArgs.add("-Xno-param-assertions")
 // List of arguments
-compileKotlin.compilerOptions.freeCompilerArgs.addAll(listOf("-Xno-param-assertions", "-Xno-receiver-assertions", "-Xno-call-assertions"))
+compileKotlin.compilerOptions.freeCompilerArgs.addAll(listOf("-Xno-receiver-assertions", "-Xno-call-assertions"))
 ```
 
 </tab>
@@ -172,9 +215,9 @@ tasks.named('compileKotlin', KotlinCompilationTask) {
         // Single experimental argument
         freeCompilerArgs.add("-Xexport-kdoc")
         // Single additional argument, can be a key-value pair
-        freeCompilerArgs.add("-opt-in=org.mylibrary.OptInAnnotation")
+        freeCompilerArgs.add("-Xno-param-assertions")
         // List of arguments
-        freeCompilerArgs.addAll(["-Xno-param-assertions", "-Xno-receiver-assertions", "-Xno-call-assertions"])
+        freeCompilerArgs.addAll(["-Xno-receiver-assertions", "-Xno-call-assertions"])
     }
 }
 ```
@@ -222,6 +265,30 @@ tasks
 
 </tab>
 </tabs>
+
+#### Example of setting of JVM target validation mode
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile::class.java).configureEach {
+    jvmTargetValidationMode.set(JvmTargetValidationMode.WARNING)
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile.class).configureEach {
+    jvmTargetValidationMode = org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING
+}
+```
+
+</tab>
+</tabs>
+
 
 Also, see [Types for compiler options](#types-for-compiler-options).
 
