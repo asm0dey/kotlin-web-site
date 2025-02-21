@@ -2,288 +2,355 @@
 
 _[Released: %kotlinEapReleaseDate%](eap.md#build-details)_
 
-> This document doesn't cover all of the features of the Early Access Preview (EAP) release, 
+> This document doesn't cover all of the features of the Early Access Preview (EAP) release,
 > but it highlights some major improvements.
 >
 > See the full list of changes in the [GitHub changelog](https://github.com/JetBrains/kotlin/releases/tag/v%kotlinEapVersion%).
 >
-{type="note"}
+{style="note"}
 
-The Kotlin %kotlinEapVersion% release is out! It mostly covers the stabilization of the [new Kotlin K2 compiler](#kotlin-k2-compiler), 
-which reached its Beta status for all targets since 1.9.20. In addition, there are also [improvements for the Gradle build tool](#gradle-improvements).
+The Kotlin %kotlinEapVersion% release is out!
+Here are some details of this EAP release:
+
+* [](#kotlin-k2-compiler-new-default-kapt-plugin)
+* [](#kotlin-multiplatform-new-dsl-to-replace-gradle-s-application-plugin)
+* [](#kotlin-native-new-inlining-optimization)
+* [Kotlin/Wasm: migration to Provider API](#kotlin-wasm-migration-to-provider-api-for-kotlin-wasm-and-kotlin-js-properties)
+* [Gradle: support for custom publication variants](#support-for-adding-custom-gradle-publication-variants)
+* [](#common-atomic-types)
+* [](#changes-in-uuid-parsing-and-formatting-functions)
+* [](#compose-compiler-source-information-included-by-default)
 
 ## IDE support
 
-The Kotlin plugins that support %kotlinEapVersion% are bundled in the latest IntelliJ IDEA and Android Studio. 
-You don't need to update the Kotlin plugin in your IDE. 
+The Kotlin plugins that support %kotlinEapVersion% are bundled in the latest IntelliJ IDEA and Android Studio.
+You don't need to update the Kotlin plugin in your IDE.
 All you need to do is to [change the Kotlin version](configure-build-for-eap.md) to %kotlinEapVersion% in your build scripts.
 
-## Kotlin K2 compiler
+See [Update to a new release](releases.md#update-to-a-new-kotlin-version) for details.
 
-The JetBrains team is still working on the stabilization of the new Kotlin K2 compiler.
-The new Kotlin K2 compiler will bring major performance improvements, speed up new language feature development,
-unify all platforms that Kotlin supports, and provide a better architecture for multiplatform projects.
+## Kotlin K2 compiler: new default kapt plugin
 
-The K2 compiler is in [Beta](components-stability.md) for all target platforms: JVM, Native, Wasm, and JS.
-The JetBrains team has ensured the quality of the new compiler by successfully compiling dozens of user and internal projects.
-A large number of users are also involved in the stabilization process, trying the new K2 compiler in their projects and reporting any problems they find.
+<primary-label ref="beta"/>
 
-### Current K2 compiler limitations
+Starting with Kotlin %kotlinEapVersion%, the K2 implementation of the kapt compiler plugin is enabled by default
+for all the projects.
 
-Enabling K2 in your Gradle project comes with certain limitations that can affect projects using Gradle versions below 8.3 in the following cases:
+The JetBrains team launched the new implementation of the kapt plugin with the K2 compiler back in Kotlin 1.9.20.
+Since then, we have further developed the internal implementation of K2 kapt and made its behavior similar to that of
+the K1 version, while significantly improving its performance as well.
 
-* Compilation of source code from `buildSrc`.
-* Compilation of Gradle plugins in included builds.
-* Compilation of other Gradle plugins if they are used in projects with Gradle versions below 8.3.
-* Building Gradle plugin dependencies.
+If you encounter any issues when using kapt with the K2 compiler,
+you can temporarily revert to the previous plugin implementation.
 
-If you encounter any of the problems mentioned above, you can take the following steps to address them:
-
-* Set the language version for `buildSrc`, any Gradle plugins, and their dependencies:
-
-  ```kotlin
-  kotlin {
-      compilerOptions {
-          languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
-          apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9)
-      }
-  }
-  ```
-  > If you configure language and API versions for specific tasks, these values will override the values set by the `compilerOptions` extension.
-  > In this case, language and API versions should not be higher than 1.9.
-  >
-  {type="note"}
-
-* Update the Gradle version in your project to 8.3 when it becomes available.
-
-### Compiler plugins support
-
-Currently, the Kotlin K2 compiler supports the following plugins:
-
-* [kapt](whatsnew1920.md#preview-kapt-compiler-plugin-with-k2)
-* [serialization](serialization.md)
-* [`all-open`](all-open-plugin.md)
-* [`no-arg`](no-arg-plugin.md)
-* [SAM with receiver](sam-with-receiver-plugin.md)
-* [Lombok](lombok.md)
-* [AtomicFU](https://github.com/Kotlin/kotlinx-atomicfu)
-* [Jetpack Compose compiler plugin](https://developer.android.com/jetpack/compose)
-* [Kotlin Symbol Processing (KSP) plugin](ksp-overview.md)
-* [`jvm-abi-gen`](https://github.com/JetBrains/kotlin/tree/master/plugins/jvm-abi-gen)
-* [Parcelize](https://plugins.gradle.org/plugin/org.jetbrains.kotlin.plugin.parcelize)
-
-> If you use any additional compiler plugins, check their documentation to see if they are compatible with K2.
->
-{type="tip"}
-
-### How to enable the Kotlin K2 compiler
-
-Starting with Kotlin 2.0.0-Beta1, the Kotlin K2 compiler is enabled by default.
-No additional actions are required.
-
-### Try the Kotlin K2 compiler in Kotlin Playground
-
-Kotlin Playground supports the 2.0.0-Beta3 release. [Check it out!](https://pl.kotl.in/czuoQprce)
-
-### Leave your feedback on the new K2 compiler
-
-We would appreciate any feedback you may have!
-
-* Provide your feedback directly to K2 developers on Kotlin
-  Slack – [get an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up?_gl=1*ju6cbn*_ga*MTA3MTk5NDkzMC4xNjQ2MDY3MDU4*_ga_9J976DJZ68*MTY1ODMzNzA3OS4xMDAuMS4xNjU4MzQwODEwLjYw)
-  and join the [#k2-early-adopters](https://kotlinlang.slack.com/archives/C03PK0PE257) channel.
-* Report any problems you face with the new K2 compiler
-  in [our issue tracker](https://kotl.in/issue).
-* [Enable the **Send usage statistics** option](https://www.jetbrains.com/help/idea/settings-usage-statistics.html) to
-  allow JetBrains to collect anonymous data about K2 usage.
-
-## Gradle improvements
-
-This version brings the following changes:
-* [Improved Gradle dependency handling for CInteropProcess in Kotlin/Native](#improved-gradle-dependency-handling-for-cinteropprocess-in-kotlin-native)
-* [Visibility changes in Gradle](#visibility-changes-in-gradle)
-* [New directory for Kotlin data in Gradle projects](#new-directory-for-kotlin-data-in-gradle-projects)
-
-### Improved Gradle dependency handling for CInteropProcess in Kotlin/Native
-
-In this release, we enhanced the handling of the `defFile` property to ensure better Gradle task dependency management in 
-Kotlin/Native projects. 
-
-Before this update, Gradle builds could fail if the `defFile` property was designated as an output 
-of another task that hadn't been executed yet. The workaround for this issue was to add a dependency on this task:
+To do this, add the following option to the `gradle.properties` file of your project:
 
 ```kotlin
-kotlin {
-    macosArm64("native") {
-        compilations.getByName("main") {
-            cinterops {
-                val cinterop by creating {
-                    defFileProperty.set(createDefFileTask.flatMap { it.defFile.asFile })
-                    project.tasks.named(interopProcessingTaskName).configure {
-                        dependsOn(createDefFileTask)
-                    }
-                }
-            }
-        }
-    }
-}
+kapt.use.k2=false
 ```
 
-To fix this, there is a new `RegularFileProperty` called `definitionFile`. Now, Gradle lazily verifies the presence of 
-the `definitionFile` property after the connected task has run later in the build process. This new approach eliminates 
-the need for additional dependencies.
+Please report any issues to our [issue tracker](https://youtrack.jetbrains.com/issue/KT-71439/K2-kapt-feedback).
 
-The `CInteropProcess` task and the `CInteropSettings` class use the `definitionFile` property instead of `defFile` and 
-`defFileProperty`:
+## Kotlin Multiplatform: new DSL to replace Gradle's Application plugin
 
-<tabs group ="build-script">
+<primary-label ref="experimental-opt-in"/>
 
-<tab id="kotlin" title="Kotlin" group-key="kotlin">
+Starting with Gradle 8.7, the [Application](https://docs.gradle.org/current/userguide/application_plugin.html) plugin is
+no longer compatible with the Kotlin Multiplatform Gradle plugin. Kotlin %kotlinEapVersion% introduces an Experimental
+DSL to achieve similar functionality. The new `executable {}` block configures execution tasks and Gradle
+[distributions](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin) for JVM targets.
+
+Before using the DSL, add the following to your build script:
 
 ```kotlin
-kotlin {
-    macosArm64("native") {
-        compilations.getByName("main") {
-            cinterops {
-                val cinterop by creating {
-                    definitionFile.set(project.file("def-file.def"))
-                }
-            }
-        }
-    }
-}
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 ```
 
-</tab>
-
-<tab id="groovy" title="Groovy" group-key="groovy">
-
-```groovy
-kotlin {
-    macosArm64("native") {
-        compilations.main {
-            cinterops {
-                cinterop {
-                    definitionFile.set(project.file("def-file.def"))
-                }
-            }
-        }
-    }
-}
-```
-
-</tab>
-
-</tabs>
-
-> `defFile` and `defFileProperty` parameters are now deprecated.
->
-{type="warning"}
-
-### Visibility changes in Gradle
-
-> This change impacts only Kotlin DSL users.
-> 
-{type="note"}
-
-In Kotlin %kotlinEapVersion%, we've modified the Kotlin Gradle Plugin for better control and safety in your build scripts.
-Previously, certain Kotlin DSL functions and properties intended for a specific DSL context would inadvertently leak to 
-other DSL contexts. This leakage could lead to the use of incorrect compiler options, settings being applied multiple times,
-and other misconfigurations:
-
-```kotlin
-kotlin {
-    // Target DSL couldn't access methods and properties defined in the
-    // kotlin{} extension DSL
-    jvm {
-        // Compilation DSL couldn't access methods and properties defined
-        // in the kotlin{} extension DSL and Kotlin jvm{} target DSL
-        compilations.configureEach {
-            // Compilation task DSLs couldn't access methods and 
-            // properties defined in the kotlin{} extension, Kotlin jvm{}
-            // target or Kotlin compilation DSL
-            compileTaskProvider.configure {
-                // For example:
-                explicitApi()
-                // ERROR as it is defined in the kotlin{} extension DSL
-                mavenPublication {}
-                // ERROR as it is defined in the Kotlin jvm{} target DSL
-                defaultSourceSet {}
-                // ERROR as it is defined in the Kotlin compilation DSL
-            }
-        }
-    }
-}
-```
-
-To fix this issue, we've added the `@KotlinGradlePluginDsl` annotation,
-preventing the exposure of the Kotlin Gradle plugin DSL functions and properties to the levels where they are not intended
-to be available. The following levels are separated from each other:
-
-* Kotlin extension
-* Kotlin target
-* Kotlin compilation
-* Kotlin compilation task
-
-If your build script is configured incorrectly, you should see compiler warnings with suggestions on how to fix it. For example:
+Then, add the new `executable {}` block. For example:
 
 ```kotlin
 kotlin {
     jvm {
-        sourceSets.getByName("jvmMain").dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3")
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        binaries {
+            // Configures a JavaExec task named "runJvm" and a Gradle distribution for the "main" compilation in this target
+            executable {
+                mainClass.set("foo.MainKt")
+            }
+
+            // Configures a JavaExec task named "runJvmAnother" and a Gradle distribution for the "main" compilation
+            executable(KotlinCompilation.MAIN_COMPILATION_NAME, "another") {
+                // Set a different class
+                mainClass.set("foo.MainAnotherKt")
+            }
+
+            // Configures a JavaExec task named "runJvmTest" and a Gradle distribution for the "test" compilation
+            executable(KotlinCompilation.TEST_COMPILATION_NAME) {
+                mainClass.set("foo.MainTestKt")
+            }
+
+            // Configures a JavaExec task named "runJvmTestAnother" and a Gradle distribution for the "test" compilation
+            executable(KotlinCompilation.TEST_COMPILATION_NAME, "another") {
+                mainClass.set("foo.MainAnotherTestKt")
+            }
         }
     }
 }
 ```
 
-In this case, the warning message for `sourceSets` is:
+In this example, Gradle's [Distribution](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
+plugin is applied on the first `executable {}` block.
 
-```kotlin
-[DEPRECATION] 'sourceSets: NamedDomainObjectContainer<KotlinSourceSet>' is deprecated.Accessing 'sourceSets' container on the Kotlin target level DSL is deprecated . Consider configuring 'sourceSets' on the Kotlin extension level .
+If you run into any issues, report them in our [issue tracker](https://kotl.in/issue) or let us know in our
+[public Slack channel](https://kotlinlang.slack.com/archives/C19FD9681).
+
+## Kotlin/Native: new inlining optimization
+<primary-label ref="experimental-opt-in"/>
+
+Kotlin %kotlinEapVersion% introduces a new inlining optimization pass, which comes before the actual code generation
+phase.
+
+The new inlining pass in the Kotlin/Native compiler should perform better than the standard LLVM inliner and improve the
+runtime performance of the generated code.
+
+The new inlining pass is currently [Experimental](components-stability.md#stability-levels-explained). To try it out,
+use the following compiler option:
+
+```none
+-Xbinary=preCodegenInlineThreshold=40
 ```
 
-We would appreciate your feedback on this change! Share your comments directly to Kotlin developers in our [#eap Slack channel](https://kotlinlang.slack.com/archives/C0KLZSCHF).
-[Get a Slack invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up).
+Our experiments show that 40 is a good compromise threshold for the optimization. According to our benchmarks, this
+gives an overall performance improvement of 9.5%. Of course, you can try out other values, too.
 
-### New directory for Kotlin data in Gradle projects
+If you experience increased binary size or compilation time, please report such issues
+in [YouTrack](https://kotl.in/issue).
 
-> With this change, you may need to add the `.kotlin` directory to your project's `.gitignore` file.
+## Kotlin/Wasm: migration to Provider API for Kotlin/Wasm and Kotlin/JS properties
+
+Previously, properties in Kotlin/Wasm and Kotlin/JS extensions were mutable (`var`) and assigned directly in build
+scripts:
+
+```kotlin
+the<NodeJsExtension>().version = "2.0.0"
+```
+
+Now, properties are exposed through the [Provider API](https://docs.gradle.org/current/userguide/properties_providers.html),
+and you must use the `.set()` function to assign values:
+
+```kotlin
+the<NodeJsEnvSpec>().version.set("2.0.0")
+```
+
+The Provider API ensures that values are lazily computed and properly integrated with task dependencies, improving build
+performance.
+
+With this change, direct property assignments are deprecated in favor of `*EnvSpec` classes,
+such as `NodeJsEnvSpec` and `YarnRootEnvSpec`.
+
+Additionally, several alias tasks have been removed to avoid confusion:
+
+| Deprecated task        | Replacement                                                     |
+|------------------------|-----------------------------------------------------------------|
+| `wasmJsRun`            | `wasmJsBrowserDevelopmentRun`                                   |
+| `wasmJsBrowserRun`     | `wasmJsBrowserDevelopmentRun`                                   |
+| `wasmJsNodeRun`        | `wasmJsNodeDevelopmentRun`                                      |
+| `wasmJsBrowserWebpack` | `wasmJsBrowserProductionWebpack` or `wasmJsBrowserDistribution` |
+| `jsRun`                | `jsBrowserDevelopmentRun`                                       |
+| `jsBrowserRun`         | `jsBrowserDevelopmentRun`                                       |
+| `jsNodeRun`            | `jsNodeDevelopmentRun`                                          |
+| `jsBrowserWebpack`     | `jsBrowserProductionWebpack` or `jsBrowserDistribution`         |
+
+If you only use Kotlin/JS or Kotlin/Wasm in build scripts, no action is required as Gradle automatically handles
+assignments.
+
+However, if you maintain a plugin based on the Kotlin Gradle Plugin, and your plugin does not apply `kotlin-dsl`, you
+must update property assignments to use the `.set()` function.
+
+## Gradle
+
+### Support for version 8.11
+Kotlin %kotlinEapVersion% is now compatible with the latest stable Gradle version, 8.11, and supports its features.
+
+### Support for adding custom Gradle publication variants
+<primary-label ref="experimental-opt-in"/>
+
+Kotlin %kotlinEapVersion% introduces support for adding custom [Gradle publication variants](https://docs.gradle.org/current/userguide/variant_attributes.html).
+This feature is available for multiplatform projects and projects targeting the JVM.
+
+> You cannot modify existing Gradle variants with this feature.
 >
-{type="warning"}
+{style="note"}
 
-In Kotlin 1.8.20, the Kotlin Gradle plugin started to store its data in the Gradle project cache directory: `<project-root-directory>/.gradle/kotlin`.
-However, the `.gradle` directory is reserved for Gradle only, and as a result it's not future-proof. To solve this, in 
-Kotlin 2.0.0-Beta2 we store Kotlin data in your `<project-root-directory>/.kotlin` by default. We will continue to store
-some data in `.gradle/kotlin` directory for backward compatibility.
+This feature is [Experimental](components-stability.md#stability-levels-explained). To opt in,
+use the `@OptIn(ExperimentalKotlinGradlePluginApi::class)` annotation or the compiler option
+`-opt-in=kotlin.ExperimentalKotlinGradlePluginApi`.
 
-There are new Gradle properties so that you can configure a directory of your choice and more:
+To add a custom Gradle publication variant, invoke the `adhocSoftwareComponent()` function, which returns an instance
+of [`AdhocComponentWithVariants`](https://docs.gradle.org/current/javadoc/org/gradle/api/component/AdhocComponentWithVariants.html)
+that you can configure in the Kotlin DSL:
 
-| Gradle property                                     | Description                                                                                                      |
-|-----------------------------------------------------|------------------------------------------------------------------------------------------------------------------|
-| `kotlin.project.persistent.dir`                     | Configures the location where your project-level data is stored. Default: `<project-root-directory>/.kotlin`     |
-| `kotlin.project.persistent.dir.gradle.disableWrite` | A boolean value that controls whether writing Kotlin data to the `.gradle` directory is disabled. Default: false |
+```kotlin
+plugins {
+    // Only JVM and Multiplatform are supported
+    kotlin("jvm")
+    // or
+    kotlin("multiplatform")
+}
 
-Add these properties to the `gradle.properties` file in your projects for them to take effect.
+kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    publishing {
+        // Returns an instance of AdhocSoftwareComponent
+        adhocSoftwareComponent()
+        // Alternatively, you can configure AdhocSoftwareComponent in the DSL block as follows
+        adhocSoftwareComponent {
+            // Add your custom variants here using the AdhocSoftwareComponent API
+        }
+    }
+}
+```
 
-## What to expect from upcoming Kotlin EAP releases
-
-The upcoming 2.0.0-Beta4 release will increase the stability of the K2 compiler.
-If you are currently using K2 in your project, 
-we encourage you to stay updated on Kotlin releases and experiment with the updated K2 compiler. 
-[Share your feedback on using Kotlin K2](#leave-your-feedback-on-the-new-k2-compiler).
-
-> Despite the fact that the Kotlin K2 compiler is in Beta for all targets, it is not recommended to use it in production.
-> This is due to K2 binaries poisoning: we need to ensure that code compiled with different versions of Kotlin maintains binary compatibility with K2 binaries.
-> 
-> You can start using the K2 compiler in production starting from **Kotlin 2.0.0-RC1**.
+> For more information on variants, see Gradle's [Customizing publishing guide](https://docs.gradle.org/current/userguide/publishing_customization.html).
 >
-{type="warning"}
+{style="tip"}
+
+## Standard library
+
+### Common atomic types
+<primary-label ref="experimental-opt-in"/>
+
+In Kotlin %kotlinEapVersion%, we are introducing common atomic types in the standard library's `kotlin.concurrent.atomics`
+package, enabling shared, platform-independent code for thread-safe operations. This simplifies development for Kotlin
+Multiplatform projects by removing the need to duplicate atomic-dependent logic across source sets.
+
+The `kotlin.concurrent.atomics` package and its properties are [Experimental](components-stability.md#stability-levels-explained).
+To opt in, use the `@OptIn(ExperimentalAtomicApi::class)` annotation or the compiler option `-opt-in=kotlin.ExperimentalAtomicApi`.
+
+Here's an example that shows how you can use `AtomicInt` to safely count processed items across multiple threads:
+
+```kotlin
+// Imports the necessary libraries
+import kotlin.concurrent.atomics.*
+import kotlinx.coroutines.*
+
+//sampleStart
+@OptIn(ExperimentalAtomicApi::class)
+suspend fun main() {
+    // Initializes the atomic counter for processed items
+    var processedItems = AtomicInt(0)
+    val totalItems = 100
+    val items = List(totalItems) { "item$it" }
+    // Splits the items into chunks for processing by multiple coroutines
+    val chunkSize = 20
+    val itemChunks = items.chunked(chunkSize)
+    coroutineScope {
+        for (chunk in itemChunks) {
+            launch {
+                for (item in chunk) {
+                    println("Processing $item in thread ${Thread.currentThread()}")
+                    processedItems += 1 // Increment counter atomically
+                }
+            }
+         }
+    }
+//sampleEnd
+    // Prints the total number of processed items
+    println("Total processed items: ${processedItems.load()}")
+}
+```
+{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="2.1.20"}
+
+To enable seamless interoperability between Kotlin's atomic types and Java's [`java.util.concurrent.atomic`](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/atomic/package-summary.html)
+atomic types, the API provides the `.asJavaAtomic()` and `.asKotlinAtomic()` extension functions. On the JVM, Kotlin
+atomics and Java atomics are the same types in runtime, so you can transform Java atomics into Kotlin atomics and vice
+versa without any overhead.
+
+Here's an example that shows how Kotlin and Java atomic types can work together:
+
+```kotlin
+// Imports the necessary libraries
+import kotlin.concurrent.atomics.*
+import java.util.concurrent.atomic.*
+
+//sampleStart
+@OptIn(ExperimentalAtomicApi::class)
+fun main() {
+    // Converts Kotlin AtomicInt to Java's AtomicInteger
+    val kotlinAtomic = AtomicInt(42)
+    val javaAtomic: AtomicInteger = kotlinAtomic.asJavaAtomic()
+    println("Java atomic value: ${javaAtomic.get()}")
+    // Java atomic value: 42
+
+    // Converts Java's AtomicInteger back to Kotlin's AtomicInt
+    val kotlinAgain: AtomicInt = javaAtomic.asKotlinAtomic()
+    println("Kotlin atomic value: ${kotlinAgain.load()}")
+    // Kotlin atomic value: 42
+}
+//sampleEnd
+```
+{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="2.1.20"}
+
+### Changes in UUID parsing and formatting functions
+<primary-label ref="experimental-opt-in"/>
+
+The JetBrains team continues to improve the support for UUIDs [introduced to the standard library in 2.0.20](whatsnew2020.md#support-for-uuids-in-the-common-kotlin-standard-library).
+
+Previously, the `parse()` function only accepted UUIDs in the hex-and-dash format. With Kotlin %kotlinEapVersion%,
+you can use `parse()` for _both_ the hex-and-dash and the plain hexadecimal (without dashes) formats.
+
+We've also introduced functions specific to operations with the hex-and-dash format in this release:
+
+* `parseHexDash()` parses UUIDs from the hex-and-dash format.
+* `toHexDashString()` converts a `Uuid` into a `String` in the hex-and-dash format (mirroring the functionality of `toString()`).
+
+These functions work similarly to [`parseHex()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/-companion/parse-hex.html)
+and [`toHexString()`](https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.uuid/-uuid/to-hex-string.html), which were
+introduced earlier for the hexadecimal format. Explicit naming for parsing and formatting functionality should improve
+code clarity and your overall experience with UUIDs.
+
+Remember that the UUID support in the standard library is still [Experimental](components-stability.md#stability-levels-explained).
+To opt in, use the `@ExperimentalUuidApi` annotation or the compiler option `-opt-in=kotlin.uuid.ExperimentalUuidApi`:
+
+```kotlin
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
+
+//sampleStart
+@OptIn(ExperimentalUuidApi::class)
+fun main() {
+    // parse() accepts a UUID in a plain hexadecimal format
+    val uuid = Uuid.parse("550e8400e29b41d4a716446655440000")
+
+    // Converts it to the hex-and-dash format
+    val hexDashFormat = uuid.toHexDashString()
+
+    // Outputs the UUID in the hex-and-dash format
+    println(hexDashFormat)
+}
+//sampleEnd
+```
+{validate="false" kotlin-runnable="true" kotlin-min-compiler-version="2.1.20"}
+
+## Compose compiler: source information included by default
+
+The Compose compiler Gradle plugin enables [including source information](https://kotlinlang.org/api/kotlin-gradle-plugin/compose-compiler-gradle-plugin/org.jetbrains.kotlin.compose.compiler.gradle/-compose-compiler-gradle-plugin-extension/include-source-information.html)
+by default on all platforms. The `includeSourceInformation` option was already enabled for Android, this change aligns
+the plugin behavior across platforms and allows support for new runtime features.
+
+Remember to check if you set this option using `freeCompilerArgs`: when used along with the plugin, it can fail the
+build due to an option being set twice.
+
+## Breaking changes and deprecations
+
+To align Kotlin Multiplatform with upcoming changes in Gradle, we are phasing out the `withJava()` function.
+[Java source sets are now created by default](multiplatform-compatibility-guide.md#java-source-sets-created-by-default).
 
 ## How to update to Kotlin %kotlinEapVersion%
 
-Starting from IntelliJ IDEA 2023.3 and Android Studio Iguana (2023.2.1) Canary 15, the Kotlin plugin is distributed as a 
-bundled plugin included in your IDE. This means that you can’t install the plugin from JetBrains Marketplace anymore. 
+Starting from IntelliJ IDEA 2023.3 and Android Studio Iguana (2023.2.1) Canary 15, the Kotlin plugin is distributed as a
+bundled plugin included in your IDE. This means that you can't install the plugin from JetBrains Marketplace anymore.
 The bundled plugin supports upcoming Kotlin EAP releases.
 
-To update to the new Kotlin EAP version, [change the Kotlin version](configure-build-for-eap.md) to %kotlinEapVersion% in your build scripts.
+To update to the new Kotlin EAP version, [change the Kotlin version](configure-build-for-eap.md#adjust-the-kotlin-version)
+to %kotlinEapVersion% in your build scripts.

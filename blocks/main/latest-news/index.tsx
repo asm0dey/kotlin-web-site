@@ -1,5 +1,6 @@
 import cn from 'classnames';
-import React from 'react';
+import { CSSProperties } from 'react';
+import dynamic from 'next/dynamic';
 
 import { Img } from 'react-optimized-image';
 
@@ -7,8 +8,14 @@ import { useTextStyles } from '@rescui/typography';
 import { Button } from '@rescui/button';
 import { ArrowTopRightIcon } from '@rescui/icons';
 
+import { useTS } from '@jetbrains/kotlin-web-site-ui/out/components/breakpoints';
+
+const MascotAnimation = dynamic(import('./mascot'), {
+    loading: () => null,
+    ssr: false,
+});
+
 import styles from './latest-news.module.css';
-import { CSSProperties } from 'react';
 
 import latestNews from '../../../latest-news/latest-news.json';
 
@@ -64,9 +71,13 @@ function Item({ title, date, link, description, position }: ItemProps) {
 export function LatestNews() {
     const textCn = useTextStyles();
 
+    const isTS = useTS();
+    const headerClass = isTS ? 'rs-h3' : 'rs-h2';
+
     return (
         <section className={styles.latestNews}>
-            <h2 className={cn(styles.h, textCn('rs-h2'))}>Latest news</h2>
+            <h2 className={cn(styles.h, textCn(headerClass))}>Latest news</h2>
+            <MascotAnimation className={styles.animation} />
             <div className={styles.news}>
                 {latestNews.map((props, i) => (
                     <Item key={props.link} position={i} {...props} />
@@ -78,7 +89,7 @@ export function LatestNews() {
                 mode="outline"
                 icon={<ArrowTopRightIcon />}
                 iconPosition="right"
-                size={"l"}
+                size={'l'}
             >
                 Kotlin blog
             </Button>

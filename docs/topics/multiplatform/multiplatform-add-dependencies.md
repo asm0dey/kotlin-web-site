@@ -3,8 +3,8 @@
 Every program requires a set of libraries to operate successfully. A Kotlin Multiplatform project can depend on
 multiplatform libraries that work for all target platforms, platform-specific libraries, and other multiplatform projects.
 
-To add a dependency on a library, update your `build.gradle(.kts)` file in the `shared` directory of your project. Set a
-dependency of the required [type](gradle-configure-project.md#dependency-types) (for example, `implementation`) in the [`dependencies`](multiplatform-dsl-reference.md#dependencies)
+To add a dependency on a library, update your `build.gradle(.kts)` file in the directory of your project containing shared code. Set a
+dependency of the required [type](gradle-configure-project.md#dependency-types) (for example, `implementation`) in the [`dependencies {}`](multiplatform-dsl-reference.md#dependencies)
 block: 
 
 <tabs group="build-script">
@@ -13,10 +13,8 @@ block:
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("com.example:my-library:1.0") // library shared for all source sets
-            }
+        commonMain.dependencies {
+            implementation("com.example:my-library:1.0") // library shared for all source sets
         }
     }
 }
@@ -35,7 +33,7 @@ kotlin {
         }
     }
 }
-``` 
+```
 
 </tab>
 </tabs>
@@ -57,17 +55,8 @@ Learn how to [change the default behavior](gradle-configure-project.md#dependenc
 
 ### Test libraries
 
-The [`kotlin.test` API](https://kotlinlang.org/api/latest/kotlin.test/) is available for multiplatform tests. When
-you create a multiplatform project, the [project wizard](https://kmp.jetbrains.com/) automatically adds test
-dependencies to common and platform-specific source sets.
-
-If you didn't use the project wizard to create your project, you
-can [add the dependencies manually](gradle-configure-project.md#set-dependencies-on-test-libraries).
-
-### kotlinx libraries
-
-If you use a multiplatform library and need to [depend on the shared code](#library-shared-for-all-source-sets), set the
-dependency only once in the shared source set. Use the library base artifact name, such as `kotlinx-coroutines-core`.
+For multiplatform tests, the [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API is available. When you
+create a multiplatform project, you can add test dependencies to all the source sets by using a single dependency in `commonTest`:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -75,10 +64,44 @@ dependency only once in the shared source set. Use the library base artifact nam
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        commonTest.dependencies {
+            implementation(kotlin("test")) // Brings all the platform dependencies automatically
+        }
+    }
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+kotlin {
+    sourceSets {
+        commonTest {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
+                implementation kotlin("test") // Brings all the platform dependencies automatically
             }
+        }
+    }
+}
+```
+
+</tab>
+</tabs>
+
+### kotlinx libraries
+
+If you use a multiplatform library and need to [depend on the shared code](#library-shared-for-all-source-sets), set the
+dependency only once in the shared source set. Use the library base artifact name, such as `kotlinx-coroutines-core`:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
         }
     }
 }
@@ -97,14 +120,13 @@ kotlin {
         }
     }
 }
-``` 
+```
 
 </tab>
 </tabs>
 
-If you use a kotlinx library and need a [platform-specific dependency](#library-used-in-specific-source-sets), you can
-use platform-specific variants of libraries with suffixes such as `-jvm` or `-js`, for
-example, `kotlinx-coroutines-core-jvm`.
+If you need a kotlinx library for a [platform-specific dependency](#library-used-in-specific-source-sets), you can
+still use library's base artifact name in the corresponding platform source set:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -112,14 +134,11 @@ example, `kotlinx-coroutines-core-jvm`.
 ```kotlin
 kotlin {
     sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:%coroutinesVersion%")
-            }
+        jvmMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
         }
     }
 }
-
 ```
 
 </tab>
@@ -130,12 +149,12 @@ kotlin {
     sourceSets {
         jvmMain {
             dependencies {
-                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:%coroutinesVersion%'
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%'
             }
         }
     }
 }
-``` 
+```
 
 </tab>
 </tabs>
@@ -146,7 +165,9 @@ You can add dependencies on libraries that have adopted Kotlin Multiplatform tec
 as [SQLDelight](https://github.com/cashapp/sqldelight). The authors of these libraries usually provide guides for adding
 their dependencies to your project.
 
-Check out this [community-maintained list of Kotlin Multiplatform libraries](https://libs.kmp.icerock.dev/).
+> Look for Kotlin Multiplatform libraries on the [JetBrains' search platform](https://klibs.io/).
+>
+{style="tip"}
 
 ### Library shared for all source sets
 
@@ -155,7 +176,7 @@ Multiplatform Mobile plugin will automatically add the corresponding parts to an
 
 > You cannot set dependencies on platform-specific libraries in the common source set.
 >
-{type="warning"}
+{style="warning"}
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -163,15 +184,11 @@ Multiplatform Mobile plugin will automatically add the corresponding parts to an
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("io.ktor:ktor-client-core:%ktorVersion%")
-            }
+        commonMain.dependencies {
+            implementation("io.ktor:ktor-client-core:%ktorVersion%")
         }
-        val androidMain by getting {
-            dependencies {
-                // dependency to a platform part of ktor-client will be added automatically
-            }
+        androidMain.dependencies {
+            // dependency to a platform part of ktor-client will be added automatically
         }
     }
 }
@@ -207,7 +224,7 @@ specified library declarations will then be available only in those source sets.
 
 > Use a common library name in such cases, not a platform-specific one. Like with SQLDelight in the example below, use `native-driver`, not `native-driver-iosx64`. Find the exact name in the library's documentation.
 >
-{type="note"}
+{style="note"}
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -215,20 +232,16 @@ specified library declarations will then be available only in those source sets.
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                // kotlinx.coroutines will be available in all source sets
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
-            }
+        commonMain.dependencies {
+            // kotlinx.coroutines will be available in all source sets
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
         }
-        val androidMain by getting {
-            dependencies {}
+        androidMain.dependencies {
+
         }
-        val iosMain by getting {
-            dependencies {
-                // SQLDelight will be available only in the iOS source set, but not in Android or common
-                implementation("com.squareup.sqldelight:native-driver:%sqlDelightVersion%")
-            }
+        iosMain.dependencies {
+            // SQLDelight will be available only in the iOS source set, but not in Android or common
+            implementation("com.squareup.sqldelight:native-driver:%sqlDelightVersion%")
         }
     }
 }
@@ -274,15 +287,11 @@ other source sets will get their versions automatically.
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(project(":some-other-multiplatform-module"))
-            }
+        commonMain.dependencies {
+            implementation(project(":some-other-multiplatform-module"))
         }
-        val androidMain by getting {
-            dependencies {
-                // platform part of :some-other-multiplatform-module will be added automatically
-            }
+        androidMain.dependencies {
+            // platform part of :some-other-multiplatform-module will be added automatically
         }
     }
 }

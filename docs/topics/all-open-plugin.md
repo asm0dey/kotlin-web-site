@@ -11,7 +11,7 @@ Kotlin provides `all-open` plugin support both for Gradle and Maven with the com
 
 > For Spring, you can use the [`kotlin-spring` compiler plugin](#spring-support).
 >
-{type="note"}
+{style="note"}
 
 ## Gradle
 
@@ -22,7 +22,7 @@ Add the plugin in your `build.gradle(.kts)` file:
 
 ```kotlin
 plugins {
-    id("org.jetbrains.kotlin.plugin.allopen") version "%kotlinVersion%"
+    kotlin("plugin.allopen") version "%kotlinVersion%"
 }
 ```
 
@@ -180,7 +180,7 @@ Of course, you can use both `kotlin-allopen` and `kotlin-spring` in the same pro
 > If you generate the project template by the [start.spring.io](https://start.spring.io/#!language=kotlin)
 > service, the `kotlin-spring` plugin will be enabled by default.
 >
-{type="note"}
+{style="note"}
 
 ## Command-line compiler
 

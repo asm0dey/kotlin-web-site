@@ -1,8 +1,12 @@
 [//]: # (title: Participate in the Kotlin Early Access Preview)
 
+<tldr>
+    <p>Latest Kotlin EAP release: <strong>%kotlinEapVersion%</strong></p>
+</tldr>
+
 You can participate in the Kotlin Early Access Preview (EAP) to try out the latest Kotlin features before they are released.
 
-We ship a few Beta (_Beta_) and Release Candidate (_RC_) builds before every feature (_1.x_) and incremental (_1.x.y_) release. 
+We ship a few Beta (_Beta_) and Release Candidate (_RC_) builds before every language (_2.x.0_) and tooling (_2.x.20_) release. 
 
 We'll be very thankful if you find and report bugs to our issue tracker [YouTrack](https://kotl.in/issue). 
 It is very likely that we'll be able to fix them before the final release, which means you won't need to wait until the next Kotlin release for your issues to be addressed. 
@@ -13,16 +17,13 @@ for everyone in [the growing Kotlin community](https://kotlinlang.org/community/
 If you have any questions and want to participate in discussions, you are welcome to join the [#eap channel in Kotlin Slack](https://app.slack.com/client/T09229ZC6/C0KLZSCHF). 
 In this channel, you can also get notifications about new EAP builds.
 
-**[Install the Kotlin EAP Plugin for IDEA or Android Studio](install-eap-plugin.md)**
+**[Configure your project for the Kotlin EAP version](configure-build-for-eap.md)**
 
 > By participating in the EAP, you expressly acknowledge that the EAP version may not be reliable, may not work as intended, and may contain errors.
 >
 > Please note that we don't provide any guarantees of compatibility between EAP and final versions of the same release. 
 >
-{type="note"}
-
-If you have already installed the EAP version and want to work on projects that were created previously, 
-check [our instructions on how to configure your build to support this version](configure-build-for-eap.md). 
+{style="note"}
 
 ## How the EAP can help you be more productive with Kotlin
 
@@ -34,7 +35,7 @@ check [our instructions on how to configure your build to support this version](
 
 ## Build details
 
-<!-- _No preview versions are currently available._ -->
+<!-- _No preview versions are currently available._ -->  
 
 <table>
     <tr>
@@ -42,18 +43,13 @@ check [our instructions on how to configure your build to support this version](
         <th>Build highlights</th>
     </tr>
     <tr>
-        <td><strong>2.0.0-Beta3</strong>
-            <p>Released: <strong>January 18, 2024</strong></p>
-            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.0.0-Beta3" target="_blank">Release on GitHub</a></p>
+        <td><strong>2.1.20-RC</strong>
+            <p>Released: <strong>February 19, 2025</strong></p>
+            <p><a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.20-RC" target="_blank">Release on GitHub</a></p>
         </td>
         <td>
-            <p>A stabilization release for the Kotlin K2 compiler.</p>
-            <p>Includes improvements for the Gradle build tool.</p>
-            <p>For more details, please refer to the <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.0.0-Beta3">changelog</a> or <a href="whatsnew-eap.md">What's new in Kotlin 2.0.0-Beta3</a>.</p>
+            <p>A tooling release with K2 kapt enabled by default.</p>
+            <p>For more details, please refer to the <a href="https://github.com/JetBrains/kotlin/releases/tag/v2.1.20-RC">changelog</a> or <a href="whatsnew-eap.md">What's new in Kotlin 2.1.20-RC</a>.</p>
         </td>
     </tr>
 </table>
-
-> If the Kotlin EAP plugin can't find the latest EAP build, check that you are using the latest version of [IntelliJ IDEA](https://www.jetbrains.com/help/idea/update.html) or [Android Studio](https://developer.android.com/studio/intro/update).
->
-{type="note"}

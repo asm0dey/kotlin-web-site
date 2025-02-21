@@ -3,8 +3,6 @@ import Head from 'next/head';
 
 import { useRouter } from 'next/router';
 
-import cn from 'classnames';
-
 import styles from './layout.module.css';
 
 interface CommunityLayoutProps {
@@ -54,7 +52,9 @@ export const Layout: FC<CommunityLayoutProps> = ({ title, ogImageName, descripti
 
             </Head>
 
-            {children}
+            <div className={styles.wrapper}>
+                {children}
+            </div>
         </>
     );
 };

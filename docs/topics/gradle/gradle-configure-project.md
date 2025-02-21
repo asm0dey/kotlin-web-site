@@ -1,13 +1,13 @@
 [//]: # (title: Configure a Gradle project)
 
 To build a Kotlin project with [Gradle](https://docs.gradle.org/current/userguide/userguide.html), 
-you need to add the [Kotlin Gradle plugin](#apply-the-plugin) to your build script file `build.gradle(.kts)` 
+you need to [add the Kotlin Gradle plugin](#apply-the-plugin) to your build script file `build.gradle(.kts)` 
 and [configure the project's dependencies](#configure-dependencies) there.
 
 > To learn more about the contents of a build script,
 > visit the [Explore the build script](get-started-with-jvm-gradle-project.md#explore-the-build-script) section.
 >
-{type="note"}
+{style="note"}
 
 ## Apply the plugin
 
@@ -18,9 +18,11 @@ from the Gradle plugins DSL:
 <tab title="Kotlin" group-key="kotlin">
 
 ```kotlin
-// replace `<...>` with the plugin name 
 plugins {
+    // Replace `<...>` with the plugin name appropriate for your target environment
     kotlin("<...>") version "%kotlinVersion%"
+    // For example, if your target environment is JVM:
+    // kotlin("jvm") version "%kotlinVersion%"
 }
 ```
 
@@ -28,9 +30,11 @@ plugins {
 <tab title="Groovy" group-key="groovy">
 
 ```groovy
-// replace `<...>` with the plugin name
 plugins {
+    // Replace `<...>` with the plugin name appropriate for your target environment
     id 'org.jetbrains.kotlin.<...>' version '%kotlinVersion%'
+    // For example, if your target environment is JVM: 
+    // id 'org.jetbrains.kotlin.jvm' version '%kotlinVersion%'
 }
 ```
 
@@ -39,31 +43,56 @@ plugins {
 
 > The Kotlin Gradle plugin (KGP) and Kotlin share the same version numbering.
 >
-{type="note"}
+{style="note"}
 
 When configuring your project, check the Kotlin Gradle plugin (KGP) compatibility with available Gradle versions. 
 In the following table, there are the minimum and maximum **fully supported** versions of Gradle and Android Gradle plugin (AGP):
 
-| KGP version   | Gradle min and max versions           | AGP min and max versions                            |
-|---------------|---------------------------------------|-----------------------------------------------------|
-| 1.9.20        | %minGradleVersion%–%maxGradleVersion% | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
-| 1.9.0–1.9.10  | 6.8.3–7.6.0                           | 4.2.2–7.4.0                                         |
-| 1.8.20–1.8.22 | 6.8.3–7.6.0                           | 4.1.3–7.4.0                                         |      
-| 1.8.0–1.8.11  | 6.8.3–7.3.3                           | 4.1.3–7.2.1                                         |   
-| 1.7.20–1.7.22 | 6.7.1–7.1.1                           | 3.6.4–7.0.4                                         |
-| 1.7.0–1.7.10  | 6.7.1–7.0.2                           | 3.4.3–7.0.2                                         |
-| 1.6.20–1.6.21 | 6.1.1–7.0.2                           | 3.4.3–7.0.2                                         |
+| KGP version   | Gradle min and max versions            | AGP min and max versions                            |
+|---------------|----------------------------------------|-----------------------------------------------------|
+| 2.1.0         | %minGradleVersion%–%maxGradleVersion%* | %minAndroidGradleVersion%–%maxAndroidGradleVersion% |
+| 2.0.20–2.0.21 | 6.8.3–8.8*                             | 7.1.3–8.5                                           |
+| 2.0.0         | 6.8.3–8.5                              | 7.1.3–8.3.1                                         |
+| 1.9.20–1.9.25 | 6.8.3–8.1.1                            | 4.2.2–8.1.0                                         |
+| 1.9.0–1.9.10  | 6.8.3–7.6.0                            | 4.2.2–7.4.0                                         |
+| 1.8.20–1.8.22 | 6.8.3–7.6.0                            | 4.1.3–7.4.0                                         |      
+| 1.8.0–1.8.11  | 6.8.3–7.3.3                            | 4.1.3–7.2.1                                         |   
+| 1.7.20–1.7.22 | 6.7.1–7.1.1                            | 3.6.4–7.0.4                                         |
+| 1.7.0–1.7.10  | 6.7.1–7.0.2                            | 3.4.3–7.0.2                                         |
+| 1.6.20–1.6.21 | 6.1.1–7.0.2                            | 3.4.3–7.0.2                                         |
 
-> You can also use Gradle and AGP versions up to the latest releases, but if you do, keep in mind that you might encounter 
-> deprecation warnings or some new features might not work.
+> *Kotlin 2.0.20–2.0.21 and Kotlin 2.1.0 are fully compatible with Gradle up to 8.6.
+> Gradle versions 8.7–8.10 are also supported, with only one exception: If you use the Kotlin Multiplatform Gradle plugin,
+> you may see deprecation warnings in your multiplatform projects calling the [`withJava()` function in the JVM target](multiplatform-dsl-reference.md#jvm-targets).
+> For more information, see the issue in [YouTrack](https://youtrack.jetbrains.com/issue/KT-66542/Gradle-JVM-target-with-withJava-produces-a-deprecation-warning).
 >
-{type="note"}
+{style="warning"}
+
+You can also use Gradle and AGP versions up to the latest releases, but if you do, keep in mind that you might encounter 
+deprecation warnings or some new features might not work.
 
 For example, the Kotlin Gradle plugin and the `kotlin-multiplatform` plugin %kotlinVersion% require the minimum Gradle
 version of %minGradleVersion% for your project to compile.
 
 Similarly, the maximum fully supported version is %maxGradleVersion%. It doesn't have deprecated Gradle
 methods and properties, and supports all the current Gradle features.
+
+### Kotlin Gradle plugin data in a project
+
+By default, the Kotlin Gradle plugin stores persistent project-specific data at the root of the project,
+in the `.kotlin` directory.
+
+> Do not commit the `.kotlin` directory to version control.
+> For example, if you are using Git, add `.kotlin` to your project's `.gitignore` file.
+>
+{style="warning"}
+
+There are properties you can add to the `gradle.properties` file of your project to configure this behavior:
+
+| Gradle property                                     | Description                                                                                                                                       |
+|-----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| `kotlin.project.persistent.dir`                     | Configures the location where your project-level data is stored. Default: `<project-root-directory>/.kotlin`                                      |
+| `kotlin.project.persistent.dir.gradle.disableWrite` | Controls whether writing Kotlin data to the `.gradle` directory is disabled (for backward compatibility with older IDEA versions). Default: false |
 
 ## Targeting the JVM
 
@@ -110,7 +139,7 @@ project
 > 
 > Instead, you can use `src/main/java`.
 >
-{type="warning"} 
+{style="warning"} 
 
 The corresponding `sourceSets` property should be updated if you are not using the default convention:
 
@@ -146,7 +175,7 @@ In the build module, you may have related compile tasks, for example:
 
 > `main` and `test` source set compile tasks are not related.
 >
-{type="note"}
+{style="note"}
 
 For related tasks like these, the Kotlin Gradle plugin checks for JVM target compatibility. Different values of 
 the [`jvmTarget` attribute](gradle-compiler-options.md#attributes-specific-to-jvm) in the `kotlin` extension or task 
@@ -187,7 +216,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile.class).configu
 
 To avoid JVM target incompatibility, [configure a toolchain](#gradle-java-toolchains-support) or align JVM versions manually.
 
-#### What can go wrong if targets are incompatible {initial-collapse-state="collapsed"}
+#### What can go wrong if targets are incompatible {initial-collapse-state="collapsed" collapsible="true"}
 
 There are two ways of manually setting JVM targets for Kotlin and Java source sets:
 * The implicit way via [setting up a Java toolchain](#gradle-java-toolchains-support).
@@ -251,7 +280,7 @@ to solve this issue.
 > }
 > ```
 >
-{type="warning"} 
+{style="warning"} 
 
 Gradle 6.7 introduced [Java toolchains support](https://docs.gradle.org/current/userguide/toolchains.html).
 Using this feature, you can:
@@ -296,7 +325,7 @@ kotlin {
 ```groovy
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(<MAJOR_JDK_VERSION>))
+        languageVersion = JavaLanguageVersion.of(<MAJOR_JDK_VERSION>)
     }
     // Or shorter:
     jvmToolchain(<MAJOR_JDK_VERSION>)
@@ -329,7 +358,7 @@ java {
 ```groovy
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(<MAJOR_JDK_VERSION>)) 
+        languageVersion = JavaLanguageVersion.of(<MAJOR_JDK_VERSION>)
     }
 }
 ```
@@ -345,7 +374,7 @@ This type of plugin manages which repositories to download a toolchain from. As 
 
 ```kotlin
 plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version("%foojayResolver%")
+    id("org.gradle.toolchains.foojay-resolver-convention") version("%foojayResolver%")
 }
 ```
 
@@ -354,7 +383,7 @@ plugins {
 
 ```groovy
 plugins {
-  id 'org.gradle.toolchains.foojay-resolver-convention' version '%foojayResolver%'
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '%foojayResolver%'
 }
 ```
 
@@ -367,7 +396,7 @@ Check that the version of `foojay-resolver-convention` corresponds to your Gradl
 > and find a string in the output starting with `[KOTLIN] Kotlin compilation 'jdkHome' argument:`.
 > The part after the colon will be the JDK version from the toolchain.
 >
-{type="note"}
+{style="note"}
 
 To set any JDK (even local) for a specific task, use the [Task DSL](#set-jdk-version-with-the-task-dsl).
 
@@ -398,7 +427,7 @@ project.tasks.withType<UsesKotlinJavaToolchain>().configureEach {
 ```groovy
 JavaToolchainService service = project.getExtensions().getByType(JavaToolchainService.class)
 Provider<JavaLauncher> customLauncher = service.launcherFor {
-    it.languageVersion.set(JavaLanguageVersion.of(<MAJOR_JDK_VERSION>))
+    it.languageVersion = JavaLanguageVersion.of(<MAJOR_JDK_VERSION>)
 }
 tasks.withType(UsesKotlinJavaToolchain::class).configureEach { task ->
     task.kotlinJavaToolchain.toolchain.use(customLauncher)
@@ -508,7 +537,7 @@ tasks.named("compileJava", JavaCompile.class) {
 > For a module, a package name in Kotlin files should be equal to the package name from `module-info.java` to avoid a 
 > "package is empty or does not exist" build failure. 
 >
-{type="note"}
+{style="note"}
 
 Learn more about:
 * [Building modules for the Java Module System](https://docs.gradle.org/current/userguide/java_library_plugin.html#sec:java_library_modular)
@@ -518,6 +547,37 @@ Learn more about:
 ### Other details
 
 Learn more about [Kotlin/JVM](jvm-get-started.md).
+
+#### Disable use of artifact in compilation task
+
+In some rare scenarios, you can experience a build failure caused by a circular dependency error. For example, when you 
+have multiple compilations where one compilation can see all internal declarations of another, and the generated artifact
+relies on the output of both compilation tasks:
+
+```none
+FAILURE: Build failed with an exception.
+
+What went wrong:
+Circular dependency between the following tasks:
+:lib:compileKotlinJvm
+--- :lib:jvmJar
+     \--- :lib:compileKotlinJvm (*)
+(*) - details omitted (listed previously)
+```
+
+To fix this circular dependency error, we've added a Gradle property: `archivesTaskOutputAsFriendModule`.
+This property controls the use of artifact inputs in the compilation task and determines if a task dependency is created
+as a result.
+
+By default, this property is set to `true` to track the task dependency. If you encounter a circular dependency error,
+you can disable the use of the artifact in the compilation task to remove the task dependency and avoid the circular 
+dependency error.
+
+To disable the use of the artifact in the compilation task, add the following to your `gradle.properties` file:
+
+```kotlin
+kotlin.build.archivesTaskOutputAsFriendModule=false
+```
 
 #### Lazy Kotlin/JVM task creation
 
@@ -531,19 +591,19 @@ in your JAR file:
 
 ```kotlin
 tasks.jar(type: Jar) {
-     from sourceSets.main.outputs
-     from sourceSets.main.kotlin.classesDirectories
+    from sourceSets.main.outputs
+    from sourceSets.main.kotlin.classesDirectories
 }
 ```
 
 ## Targeting multiple platforms
 
-Projects targeting [multiple platforms](multiplatform-dsl-reference.md#targets), called [multiplatform projects](multiplatform-get-started.md),
+Projects targeting [multiple platforms](multiplatform-dsl-reference.md#targets), called [multiplatform projects](multiplatform-intro.md),
 require the `kotlin-multiplatform` plugin.
 
 >The `kotlin-multiplatform` plugin works with Gradle %minGradleVersion% or later.
 >
-{type="note"}
+{style="note"}
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -566,7 +626,7 @@ plugins {
 </tab>
 </tabs>
 
-Learn more about [Kotlin Multiplatform for different platforms](multiplatform-get-started.md) and 
+Learn more about [Kotlin Multiplatform for different platforms](multiplatform-intro.md) and 
 [Kotlin Multiplatform for iOS and Android](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-getting-started.html).
 
 ## Targeting Android
@@ -608,8 +668,8 @@ project contains Java files). If you don't store them separately, specify the so
 
 ```kotlin
 kotlin {
-    sourceSets["main"].apply {    
-        kotlin.srcDir("src/main/myKotlin") 
+    sourceSets["main"].apply {
+        kotlin.srcDir("src/main/myKotlin")
     }
 }
 ```
@@ -673,10 +733,8 @@ To add a dependency on a library, set the dependency of the required [type](#dep
 ```kotlin
 kotlin {
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("com.example:my-library:1.0")
-            }
+        commonMain.dependencies {
+            implementation("com.example:my-library:1.0")
         }
     }
 }
@@ -774,7 +832,7 @@ file:
 kotlin.stdlib.jdk.variants.version.alignment=false
 ```
 
-##### Other ways to align versions {initial-collapse-state="collapsed"}
+##### Other ways to align versions {initial-collapse-state="collapsed" collapsible="true"}
 
 * If you have issues with version alignment, you can align all versions via the Kotlin [BOM](https://docs.gradle.org/current/userguide/platforms.html#sub:bom_import). 
   Declare a platform dependency on `kotlin-bom` in your build script:
@@ -906,11 +964,8 @@ kotlin.stdlib.jdk.variants.version.alignment=false
 
 The [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) API is available for testing Kotlin projects on
 all supported platforms.
-Add the dependency `kotlin-test` to the `commonTest` source set, so that the Gradle plugin can infer the corresponding
-test dependencies for each test source set:
-* `kotlin-test-common` and `kotlin-test-annotations-common` for common source sets
-* `kotlin-test-junit` for JVM source sets
-* `kotlin-test-js` for Kotlin/JS source sets
+Add the `kotlin-test` dependency to the `commonTest` source set, so that the Gradle plugin can infer the corresponding
+test dependencies for each test source set.
 
 Kotlin/Native targets do not require additional test dependencies, and the `kotlin.test` API implementations are built-in.
 
@@ -920,10 +975,8 @@ Kotlin/Native targets do not require additional test dependencies, and the `kotl
 ```kotlin
 kotlin {
     sourceSets {
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test")) // This brings all the platform dependencies automatically
-            }
+         commonTest.dependencies {
+             implementation(kotlin("test")) // This brings all the platform dependencies automatically
         }
     }
 }
@@ -949,9 +1002,11 @@ kotlin {
 
 > You can use shorthand for a dependency on a Kotlin module, for example, kotlin("test") for "org.jetbrains.kotlin:kotlin-test".
 >
-{type="note"}
+{style="note"}
 
 You can use the `kotlin-test` dependency in any shared or platform-specific source set as well.
+
+#### JVM variants of kotlin-test
 
 For Kotlin/JVM, Gradle uses JUnit 4 by default. Therefore, the `kotlin("test")` dependency resolves to the variant for
 JUnit 4, namely `kotlin-test-junit`.
@@ -973,10 +1028,8 @@ kotlin {
         }
     }
     sourceSets {
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
+        commonTest.dependencies {
+            implementation(kotlin("test"))
         }
     }
 }
@@ -1040,19 +1093,21 @@ test {
 
 [Learn how to test code using JUnit on the JVM](jvm-test-using-junit.md).
 
-If you need to use a different JVM test framework, disable automatic testing framework selection by
-adding the line `kotlin.test.infer.jvm.variant=false` to the project's `gradle.properties` file.
-After doing this, add the framework as a Gradle dependency.
+Automatic JVM variant resolution can sometimes cause problems for your configuration. In that case, you can specify
+the necessary framework explicitly and disable the automatic resolution by adding this line to the project `gradle.properties` file:
+
+```text
+kotlin.test.infer.jvm.variant=false
+```
 
 If you have used a variant of `kotlin("test")` in your build script explicitly and your project build stopped working with
 a compatibility conflict,
-see [this issue in the Compatibility Guide](compatibility-guide-15.md#do-not-mix-several-jvm-variants-of-kotlin-test-in-a-single-project).
+see [this issue in the Compatibility guide](compatibility-guide-15.md#do-not-mix-several-jvm-variants-of-kotlin-test-in-a-single-project).
 
 ### Set a dependency on a kotlinx library
 
-If you use a [`kotlinx` library](https://github.com/Kotlin/kotlinx.coroutines) and need a platform-specific dependency, 
-you can use platform-specific variants of libraries with suffixes such as `-jvm` or `-js`, for example, 
-`kotlinx-coroutines-core-jvm`. You can also use the library's base artifact name instead – `kotlinx-coroutines-core`.
+If you use a multiplatform library and need to depend on the shared code, set the dependency only once in the shared
+source set. Use the library's base artifact name, such as `kotlinx-coroutines-core` or `ktor-client-core`:
 
 <tabs group="build-script">
 <tab title="Kotlin" group-key="kotlin">
@@ -1060,46 +1115,8 @@ you can use platform-specific variants of libraries with suffixes such as `-jvm`
 ```kotlin
 kotlin {
     sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:%coroutinesVersion%")
-            }
-        }
-    }
-}
-```
-
-</tab>
-<tab title="Groovy" group-key="groovy">
-
-```groovy
-kotlin {
-    sourceSets {
-        jvmMain {
-            dependencies {
-                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:%coroutinesVersion%'
-            }
-        }
-    }
-}
-```
-
-</tab>
-</tabs>
-
-If you use a multiplatform library and need to depend on the shared code, set the dependency only once, in the shared
-source set. Use the library's base artifact name, such as `kotlinx-coroutines-core` or `ktor-client-core`.
-
-<tabs group="build-script">
-<tab title="Kotlin" group-key="kotlin">
-
-```kotlin
-kotlin {
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
-            }
+        commonMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
         }
     }
 }
@@ -1112,6 +1129,40 @@ kotlin {
 kotlin {
     sourceSets {
         commonMain {
+            dependencies {
+                implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%'
+            }
+        }
+    }
+}
+```
+
+</tab>
+</tabs>
+
+If you need a kotlinx library for a platform-specific dependency, you can still use the library's base artifact name in
+the corresponding platform source set:
+
+<tabs group="build-script">
+<tab title="Kotlin" group-key="kotlin">
+
+```kotlin
+kotlin {
+    sourceSets {
+        jvmMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%")
+        }
+    }
+}
+```
+
+</tab>
+<tab title="Groovy" group-key="groovy">
+
+```groovy
+kotlin {
+    sourceSets {
+        jvmMain {
             dependencies {
                 implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:%coroutinesVersion%'
             }
@@ -1166,7 +1217,7 @@ repositories {
 </tab>
 <tab title="Groovy" group-key="groovy">
 
-```kotlin
+```groovy
 repositories {
     mavenCentral()
 }
@@ -1181,7 +1232,7 @@ Popular repositories are [Maven Central](https://central.sonatype.com/) and [Goo
 > add it as the last repository in your `repositories{}` block. For more information, see
 > [The case for mavenLocal()](https://docs.gradle.org/current/userguide/declaring_repositories.html#sec:case-for-maven-local).
 > 
-{type="warning"}
+{style="warning"}
 
 If you need to declare the same repositories in more than one subproject, declare the repositories centrally in the
 `dependencyResolutionManagement{}` block in your `settings.gradle(.kts)` file:

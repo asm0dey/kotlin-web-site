@@ -28,7 +28,7 @@ important, as it affects the list of platforms to which this code is compiled.
 
 The Kotlin compiler gets the source code as input and produces a set of platform-specific binaries as a result. When
 compiling multiplatform projects, it can produce multiple binaries from the same code. For example, the compiler can
-produce JVM `.classfiles` and native executable files from the same Kotlin file:
+produce JVM `.class` files and native executable files from the same Kotlin file:
 
 ![Common code](common-code-diagram.svg){width=700}
 
@@ -59,7 +59,7 @@ binaries, available language constructions, and allowed dependencies.
 > Targets can also be referred to as platforms. See the
 > full [list of supported targets](multiplatform-dsl-reference.md#targets).
 >
-> {type="note"}
+> {style="note"}
 
 You should first _declare_ a target to instruct Kotlin to compile code for that specific target. In Gradle, you declare
 targets using predefined DSL calls inside the `kotlin {}` block:
@@ -123,7 +123,7 @@ kotlin {
     // Source set declaration:
     sourceSets {
         commonMain {
-            // configure the commonMain source set
+            // Configure the commonMain source set
         }
     }
 }
@@ -141,7 +141,7 @@ In a multiplatform project with native and JS targets, the following code in `co
 ```kotlin
 // commonMain/kotlin/common.kt
 // Doesn't compile in common code
-fun common() {
+fun greeting() {
     java.io.File("greeting.txt").writeText("Hello, Multiplatform!")
 }
 ```
@@ -204,7 +204,7 @@ Consider an example where you need to target all modern Apple devices and Androi
 
 ```kotlin
 kotlin {
-    android()
+    androidTarget()
     iosArm64()   // 64-bit iPhone devices
     macosArm64() // Modern Apple Silicon-based Macs
     watchosX64() // Modern 64-bit Apple Watch devices
@@ -250,7 +250,7 @@ in `appleMain`, and you can add the `randomUUID()` function here.
 > all intermediate source sets that Kotlin creates and sets up by default and learn what you should do
 > if Kotlin doesn't provide the intermediate source set you need by default.
 >
-{type="tip"}
+{style="tip"}
 
 During compilation to a specific target, Kotlin gets all of the source sets, including intermediate source sets, labeled
 with this target. Therefore, all the code written in the `commonMain`, `appleMain`, and `iosArm64Main` source sets is
@@ -261,9 +261,9 @@ combined during compilation to the `iosArm64` platform target:
 > It's okay if some source sets don't have sources. For example, in iOS development, there's usually no need to provide
 > code that is specific for iOS devices but not for iOS simulators. `iosArm64Main` is therefore rarely used.
 >
-{type="tip"}
+{style="tip"}
 
-#### Apple device and simulator targets {initial-collapse-state="collapsed"}
+#### Apple device and simulator targets {initial-collapse-state="collapsed" collapsible="true"}
 
 When you use Kotlin Multiplatform to develop iOS mobile applications, you usually work with the `iosMain` source set.
 While you might think it's a platform-specific source set for the `ios` target, there is no single `ios` target. Most
@@ -289,7 +289,7 @@ devices, respectively, you can use the `tvosMain` intermediate source set for al
 ## Integration with tests
 
 Real-life projects also require tests alongside the main production code. This is why all source sets created by
-default have the `Main` and `Test` prefixes. `Main` contains production code, while `Test` contains tests for this code.
+default have the `Main` and `Test` suffixes. `Main` contains production code, while `Test` contains tests for this code.
 The connection between them is established automatically, and tests can use the API provided by the `Main` code without
 additional configuration.
 
@@ -299,7 +299,7 @@ source sets, such as `jvmTest`, are used to write platform-specific tests, for e
 need JVM APIs.
 
 Besides having a source set to write your common test, you also need a multiplatform testing framework. Kotlin
-provides a default [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test) library that comes with
+provides a default [`kotlin.test`](https://kotlinlang.org/api/latest/kotlin.test/) library that comes with
 the `@kotlin.Test` annotation and various assertion methods like `assertEquals` and `assertTrue`.
 
 You can write platform-specific tests like regular tests for each platform in their respective source sets. Like with
@@ -312,6 +312,5 @@ tutorial](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-
 ## What's next?
 
 * [Learn more about declaring and using predefined source sets in Gradle scripts](multiplatform-hierarchy.md)
-* [Learn how to configure compilations](multiplatform-configure-compilations.md)
-
-<!-- Learn how to create custom intermediate source sets and work with low-level abstractions of the Gradle build process, such as tasks, configurations, and outputs. -->
+* [Explore advanced concepts of the multiplatform project structure](multiplatform-advanced-project-structure.md)
+* [Learn more about target compilation and creating custom compilations](multiplatform-configure-compilations.md)

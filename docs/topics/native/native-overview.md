@@ -23,7 +23,7 @@ Kotlin/Native supports the following platforms:
 > To compile Apple targets, macOS, iOS, tvOS, and watchOS, you need [Xcode](https://apps.apple.com/us/app/xcode/id497799835)
 > and its command-line tools installed.
 > 
-{type="note"}
+{style="note"}
 
 [See the full list of supported targets](native-target-support.md).
 
@@ -47,20 +47,20 @@ static or dynamic [C libraries](native-c-interop.md),
 Swift/Objective-C [frameworks](native-objc-interop.md),
 graphical engines, and anything else directly from Kotlin/Native.
 
-Kotlin/Native [libraries](native-platform-libs.md) help share Kotlin
+Kotlin/Native [platform libraries](native-platform-libs.md) help share Kotlin
 code between projects.
 POSIX, gzip, OpenGL, Metal, Foundation, and many other popular libraries and Apple frameworks
 are pre-imported and included as Kotlin/Native libraries in the compiler package.
 
 ## Sharing code between platforms
 
-[Kotlin Multiplatform](multiplatform.md) helps share common code across multiple platforms, including Android, iOS, JVM,
+[Kotlin Multiplatform](multiplatform-intro.md) helps share common code across multiple platforms, including Android, iOS, JVM,
 web, and native. Multiplatform libraries provide the necessary APIs for common Kotlin code and allow writing shared parts
 of projects in Kotlin all in one place.
 
-You can use the [Get started with Kotlin Multiplatform](multiplatform-get-started.md) tutorial
+You can use the [Create your Kotlin Multiplatform app](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-create-first-app.html) tutorial
 to create applications and share business logic between iOS and Android. To share UIs among iOS, Android, desktop, and web,
-try [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/),
+complete the tutorial for [Compose Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html),
 JetBrains' declarative UI framework based on Kotlin and [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ## How to get started
@@ -69,14 +69,14 @@ New to Kotlin? Take a look at [Getting started with Kotlin](getting-started.md).
 
 Recommended documentation:
 
-* [Get started with Kotlin Multiplatform](multiplatform-get-started.md)
+* [Introduction to Kotlin Multiplatform](multiplatform-intro.md)
 * [Interoperability with C](native-c-interop.md)
 * [Interoperability with Swift/Objective-C](native-objc-interop.md)
 
 Recommended tutorials:
 
 * [Get started with Kotlin/Native](native-get-started.md)
-* [Get started with Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-getting-started.html)
+* [Create your Kotlin Multiplatform app](https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-create-first-app.html)
 * [Mapping primitive data types from C](mapping-primitive-data-types-from-c.md)
 * [Kotlin/Native as a dynamic Library](native-dynamic-libraries.md)
 * [Kotlin/Native as an Apple framework](apple-framework.md)

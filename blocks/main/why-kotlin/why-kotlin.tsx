@@ -5,11 +5,12 @@ import { useTextStyles, createTextCn } from '@rescui/typography';
 import { Button } from '@rescui/button';
 import { ThemeProvider } from '@rescui/ui-contexts';
 import { CodeIcon, PlayIcon, DownIcon } from '@rescui/icons';
-import NavItem from '@jetbrains/kotlin-web-site-ui/out/components/nav-item/';
+import NavItem from '@jetbrains/kotlin-web-site-ui/out/components/nav-item';
 
-import { SidebarMenu, SidebarMenuHeader } from '@jetbrains/kotlin-web-site-ui/out/components/sidebar-menu/';
+import { SidebarMenu, SidebarMenuHeader } from '@jetbrains/kotlin-web-site-ui/out/components/sidebar-menu';
 
 import '@jetbrains/kotlin-web-site-ui/out/components/layout';
+import { useTS } from '@jetbrains/kotlin-web-site-ui/out/components/breakpoints';
 
 import { CodeBlock } from '../../../components/code-block/code-block';
 
@@ -37,6 +38,9 @@ export const WhyKotlin: FC<Props> = ({}) => {
     const textCn = useTextStyles();
     const darkTextCn = createTextCn('dark');
 
+    const isTS = useTS();
+    const headerClass = isTS ? 'rs-h3' : 'rs-h2';
+
     const codeExamplesList = [
         { children: 'Simple', codeExample: simpleExample },
         { children: 'Asynchronous', codeExample: asyncExample },
@@ -54,8 +58,9 @@ export const WhyKotlin: FC<Props> = ({}) => {
         codeInstanceRef?.current?.scrollResultsToView();
     }, [codeInstanceRef]);
 
+    const { codeExample, children, ...options } = codeExamplesList[activeIndex];
     const handleOpenInPlaygroundButton = useCallback(() => {
-        const link = generateCrosslink(codeExamplesList[activeIndex].codeExample);
+        const link = generateCrosslink(codeExample, options);
         if (typeof window !== 'undefined') {
             window.open(link, '_blank');
         }
@@ -81,7 +86,7 @@ export const WhyKotlin: FC<Props> = ({}) => {
         <ThemeProvider theme={'dark'}>
             <section className={styles.whyKotlin} data-test={'main-page-why-kotlin'}>
                 <div className={cn('ktl-layout', 'ktl-layout--center')}>
-                    <div className={cn(darkTextCn('rs-h1'), styles.sectionTitle)}>Why Kotlin?</div>
+                    <div className={cn(darkTextCn(headerClass), styles.sectionTitle)}>Why Kotlin?</div>
                 </div>
 
                 <div className={styles.whyKotlinMobileWrapper}>
@@ -94,7 +99,7 @@ export const WhyKotlin: FC<Props> = ({}) => {
                                         iconPosition={'right'}
                                         onClick={handleMobileMenuToggle}
                                     >
-                                        {codeExamplesList[activeIndex].children}
+                                        {children}
                                     </NavItem>
 
                                     <SidebarMenu
